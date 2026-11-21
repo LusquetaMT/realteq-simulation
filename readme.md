@@ -10,7 +10,7 @@ O modelo também avalia os efeitos da implementação de um checklist de triagem
 
 ## Modelo matemático
 
-A simulação utiliza princípios de Dinâmica de Sistemas, baseando-se em um Diagrama de Laços Causais (DLC) e um Diagrama de Estoques e Fluxos (DEF).
+A simulação utiliza princípios de **Dinâmica de Sistemas**, baseando-se em um Diagrama de Laços Causais (DLC) e um Diagrama de Estoques e Fluxos (DEF).
 
 São considerados dois estoques:
 
@@ -19,23 +19,60 @@ São considerados dois estoques:
 
 A evolução dos estoques segue:
 
-\[
+$$
 F(t+\Delta t)=F(t)+[\lambda(t)-A(t)]\Delta t
-\]
+$$
+
+Onde:
+
+- $F(t)$: quantidade de chamados na fila.
+- $\lambda(t)$: taxa de chegada de chamados.
+- $A(t)$: taxa de atendimento.
+- $\Delta t$: passo temporal da simulação.
 
 A capacidade de atendimento é determinada por:
 
-\[
+$$
 C=\frac{H}{h}
-\]
+$$
 
-As filas compartilham a capacidade disponível de atendimento externo.
+Onde $H$ representa as horas disponíveis de campo por dia e $h$ representa a duração média de uma visita.
+
+As duas filas compartilham a capacidade disponível de atendimento externo, distribuída proporcionalmente à quantidade de chamados pendentes.
 
 ### Retroalimentação sistêmica
 
-O modelo representa o laço de reforço R2, no qual o aumento das filas gera mais cobranças dos clientes, elevando a pressão sobre a recepção e a probabilidade de encaminhamentos indevidos.
+O modelo representa o **laço de reforço R2**, no qual o aumento das filas gera mais cobranças dos clientes, elevando a pressão sobre a recepção e a probabilidade de encaminhamentos indevidos.
 
-A implementação de um checklist técnico reduz essa probabilidade e permite avaliar os efeitos da intervenção.
+A pressão das cobranças é modelada por:
+
+$$
+P(t)=c[F_L(t-\tau)+F_I(t-\tau)]
+$$
+
+Onde $c$ representa o coeficiente de cobranças e $\tau$ representa o atraso de retroalimentação.
+
+A probabilidade de erro na triagem é determinada por:
+
+$$
+q(t)=(1-e)\min(1,q_0+kP(t))
+$$
+
+Onde:
+
+- $q_0$: probabilidade inicial de erro.
+- $k$: sensibilidade da triagem às cobranças.
+- $e$: eficácia do checklist técnico, entre 0 e 1.
+
+A taxa de encaminhamentos indevidos é calculada por:
+
+$$
+\lambda_I(t)=q(t)\lambda_R(t)
+$$
+
+Onde $\lambda_R(t)$ representa a taxa de demandas potencialmente solucionáveis remotamente.
+
+A implementação do checklist reduz a probabilidade de encaminhamentos indevidos, permitindo avaliar seus efeitos sobre as filas e a utilização da capacidade de campo.
 
 ## Estrutura do projeto
 
@@ -86,9 +123,18 @@ python validation.py
 
 ## Dados e parâmetros
 
-O levantamento histórico contempla 194 chamados externos, dos quais 22 foram identificados como potencialmente solucionáveis remotamente (11,34%).
+O levantamento histórico contempla **194 chamados externos**, dos quais **22 foram identificados como potencialmente solucionáveis remotamente (11,34%)**.
 
-O modelo utiliza parâmetros operacionais hipotéticos, incluindo duração das visitas, intensidade das cobranças e eficácia do checklist.
+Os dados correspondem aos atendimentos externos registrados pelo técnico participante da pesquisa, não à totalidade dos chamados recebidos pela empresa.
+
+O modelo utiliza parâmetros operacionais hipotéticos, incluindo:
+
+- Horas disponíveis de campo por dia.
+- Duração média das visitas.
+- Intensidade das cobranças dos clientes.
+- Sensibilidade da triagem à pressão.
+- Atraso de retroalimentação.
+- Eficácia do checklist técnico.
 
 Esses parâmetros podem ser ajustados em `parameters.py`.
 
@@ -96,14 +142,20 @@ Esses parâmetros podem ser ajustados em `parameters.py`.
 
 Foram implementados:
 
-- Comparação entre operação atual e operação com checklist técnico.
-- Análise de sensibilidade da duração das visitas e eficácia do checklist.
-- Verificação da conservação dos chamados.
-- Análise de convergência numérica.
-- Calibração da taxa inicial de erro utilizando os registros históricos.
+- **Simulação de cenários:** comparação entre a operação atual e a operação com checklist técnico.
+- **Análise de sensibilidade:** avaliação dos efeitos da duração das visitas e da eficácia do checklist.
+- **Conservação de chamados:** verificação do equilíbrio entre entradas, atendimentos e estoques.
+- **Convergência numérica:** comparação dos resultados com diferentes passos temporais.
+- **Calibração:** ajuste da taxa inicial de erro para reproduzir os 22 encaminhamentos indevidos observados no cenário de referência.
 
 ## Limitações
 
-O simulador é determinístico e utiliza taxas médias de chegada. A capacidade operacional e alguns coeficientes de retroalimentação são hipóteses de modelagem, não medições diretas da empresa.
+O simulador é determinístico e utiliza taxas médias de chegada de chamados.
 
-Os resultados representam cenários simulados e não previsões verificadas do funcionamento real da Realteq.
+A capacidade operacional, a demanda potencialmente remota e os coeficientes de retroalimentação são hipóteses de modelagem, não medições diretas da empresa.
+
+Os chamados são representados por quantidades contínuas, podendo assumir valores fracionários.
+
+A calibração reproduz um indicador histórico, mas não constitui validação independente de todos os mecanismos do sistema.
+
+Os resultados representam **cenários simulados**, e não previsões verificadas do funcionamento real da Realteq.
