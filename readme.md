@@ -84,6 +84,7 @@ realteq-simulation/
 ├── visualization.py
 ├── sensitivity.py
 ├── validation.py
+├── extremos.py
 ├── main.py
 └── README.md
 ```
@@ -121,6 +122,12 @@ Execute as validações matemáticas:
 python validation.py
 ```
 
+Execute os testes de valores extremos e a busca de equilíbrios:
+
+```bash
+python extremos.py
+```
+
 ## Dados e parâmetros
 
 O levantamento histórico contempla **194 chamados externos**, dos quais **22 foram identificados como potencialmente solucionáveis remotamente (11,34%)**.
@@ -147,6 +154,8 @@ Foram implementados:
 - **Conservação de chamados:** verificação do equilíbrio entre entradas, atendimentos e estoques.
 - **Convergência numérica:** comparação dos resultados com diferentes passos temporais.
 - **Calibração:** ajuste da taxa inicial de erro para reproduzir os 22 encaminhamentos indevidos observados no cenário de referência.
+- **Valores extremos:** cenários-limite (triagem perfeita, todos os chamados enviados a campo, sem horas de campo, sem o laço R2, entre outros).
+- **Equilíbrios:** condição para a fila parar de crescer (eficácia mínima do checklist e duração máxima das visitas) e ponto de virada instável criado pelo laço R2.
 
 ## Limitações
 
@@ -159,3 +168,14 @@ Os chamados são representados por quantidades contínuas, podendo assumir valor
 A calibração reproduz um indicador histórico, mas não constitui validação independente de todos os mecanismos do sistema.
 
 Os resultados representam **cenários simulados**, e não previsões verificadas do funcionamento real da Realteq.
+
+## Declaração de uso de Inteligência Artificial
+
+O desenvolvimento deste projeto contou com o auxílio de ferramentas de Inteligência Artificial generativa, utilizadas como suporte à implementação, revisão e validação do modelo computacional.
+
+- **ChatGPT (OpenAI):** auxiliou na implementação dos scripts de simulação, análise de sensibilidade, visualização de resultados, calibração e validação matemática, além da documentação do projeto.
+- **Claude (Anthropic):** auxiliou no desenvolvimento do script `extremos.py`, responsável pelos testes de valores extremos e pela análise dos pontos de equilíbrio do sistema.
+
+As ferramentas foram utilizadas como apoio técnico. A definição do problema, a construção do modelo conceitual, a escolha dos parâmetros e a interpretação dos resultados foram realizadas pelo grupo.
+
+O código e os resultados foram revisados e testados pelos integrantes, que assumem a responsabilidade pelo conteúdo apresentado.
